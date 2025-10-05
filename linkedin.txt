@@ -1,0 +1,46 @@
+🚀 Excited to announce Pluggo - a new open-source Go framework for building type-safe plugin systems! 
+
+After working on various microservices architectures, I realized there was a need for a simple yet powerful way to create dynamic, extensible applications in Go. That's why I built Pluggo! 🔌
+
+✨ What makes Pluggo special?
+
+🔒 **Type Safety First**: Generic-based functions with compile-time type checking - no more runtime surprises!
+
+🌐 **HTTP-Based Architecture**: Plugins communicate over HTTP, making them language-agnostic and easily testable
+
+📋 **Built-in Validation**: Automatic JSON schema generation and validation with custom rules
+
+⚡ **Dynamic Loading**: Load and execute plugins at runtime without rebuilding your main application
+
+🏥 **Health Monitoring**: Built-in health checks to ensure your plugins are running smoothly
+
+The best part? It's incredibly simple to use. Creating a plugin is as easy as:
+
+```go
+func Hello(ctx context.Context, in *Input) (*Output, error) {
+    return &Output{Greeting: "Hello, " + in.Name + "!"}, nil
+}
+
+p := pluggo.NewPlugin()
+p.AddFunction("hello", pluggo.NewFunctionHandler(Hello, validator).Handler())
+p.Start()
+```
+
+And calling it from your client:
+```go
+hello := pluggo.NewFunction[Input, Output]("hello", client.Connection())
+result, err := hello.Call(&Input{Name: "World"})
+```
+
+Perfect for:
+• Building extensible applications
+• Creating modular architectures  
+• Implementing plugin ecosystems
+• Microservices communication
+• Dynamic feature loading
+
+🔗 Check it out on GitHub: https://github.com/henomis/pluggo
+
+Would love to hear your thoughts on plugin architectures and how you handle extensibility in your Go applications! 💭
+
+#golang #opensource #plugins #microservices #softwaredevelopment #programming #architecture
