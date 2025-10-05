@@ -21,7 +21,9 @@ func main() {
 		fmt.Printf("error opening plugin: %v\n", err)
 		return
 	}
-	defer client.Close()
+	defer func() {
+		_ = client.Close()
+	}()
 
 	schemas, err := client.Schemas()
 	if err != nil {

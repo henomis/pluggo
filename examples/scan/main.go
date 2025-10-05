@@ -22,7 +22,7 @@ func main() {
 		return
 	}
 
-	var data map[string]Data = make(map[string]Data)
+	var data = make(map[string]Data)
 
 	for _, plugin := range pluginsFiles {
 		fmt.Println("Found plugin:", plugin)
@@ -52,6 +52,6 @@ func main() {
 		}
 		fmt.Printf("Called plugin %s\n", d.Path)
 		fmt.Println("Plugin output:", out.Text)
-		d.Plugin.Close()
+		_ = d.Plugin.Close()
 	}
 }

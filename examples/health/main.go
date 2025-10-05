@@ -22,7 +22,9 @@ func main() {
 		fmt.Printf("error opening plugin: %v\n", err)
 		return
 	}
-	defer client.Close()
+	defer func() {
+		_ = client.Close()
+	}()
 
 	check := client.HealthCheck()
 	go func() {
