@@ -2,7 +2,7 @@
 
 A simple HTTP-based plugin system for Go.
 
-[![GoDoc](https://godoc.org/github.com/henomis/pluggo?status.svg)](https://godoc.org/github.com/henomis/pluggo) [![Go Report Card](https://goreportcard.com/badge/github.com/henomis/pluggo)](https://goreportcard.com/report/github.com/henomis/pluggo) [![GitHub release](https://img.shields.io/github/release/henomis/pluggo.svg)](https://github.com/henomis/pluggo/releases)
+[![Build Status](https://github.com/henomis/pluggo/actions/workflows/checks.yml/badge.svg)](https://github.com/henomis/pluggo/actions/workflows/checks.yml) [![GoDoc](https://godoc.org/github.com/henomis/pluggo?status.svg)](https://godoc.org/github.com/henomis/pluggo) [![Go Report Card](https://goreportcard.com/badge/github.com/henomis/pluggo)](https://goreportcard.com/report/github.com/henomis/pluggo) [![GitHub release](https://img.shields.io/github/release/henomis/pluggo.svg)](https://github.com/henomis/pluggo/releases)
 
 ## 🚀 Features
 

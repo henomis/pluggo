@@ -49,7 +49,9 @@ func NewFunction[T, R any](name string, clientConnection *Connection) *Function[
 		}
 
 		if resp.Body != nil {
-			defer resp.Body.Close()
+			defer func() {
+				_ = resp.Body.Close()
+			}()
 		}
 
 		out, err := io.ReadAll(resp.Body)
@@ -111,7 +113,9 @@ func (f *Function[T, R]) Schema() (*Schema, error) {
 	}
 
 	if resp.Body != nil {
-		defer resp.Body.Close()
+		defer func() {
+			_ = resp.Body.Close()
+		}()
 	}
 
 	if resp.StatusCode != http.StatusOK {

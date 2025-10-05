@@ -104,7 +104,9 @@ func encodeOutput(w http.ResponseWriter, status int, v any) error {
 // It performs validation if a validator is provided, then deserializes
 // the JSON into the expected input type T.
 func decodeInput[T any](r *http.Request, validator *Validator[T]) (*T, error) {
-	defer r.Body.Close()
+	defer func() {
+		_ = r.Body.Close()
+	}()
 
 	// Read body
 	data, err := io.ReadAll(r.Body)

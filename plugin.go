@@ -134,7 +134,7 @@ func (l *Plugin) Stop() {
 	}()
 
 	if l.httpServer != nil {
-		l.httpServer.Close()
+		_ = l.httpServer.Close()
 	}
 }
 
@@ -152,6 +152,7 @@ func validateFunctionName(function string) error {
 		return errors.New("function name cannot be longer than 128 characters")
 	}
 	for _, r := range function {
+		// nolint:staticcheck // allowed characters
 		if !(r == '-' || r == '_' || r == '.' || (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9')) {
 			return fmt.Errorf("function name contains invalid character: %q", r)
 		}

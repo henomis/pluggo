@@ -234,7 +234,9 @@ func (c *Client) Schemas() (Schemas, error) {
 	if err != nil {
 		return nil, &PluginExecutionError{Err: err}
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, &PluginExecutionError{Err: fmt.Errorf("plugin returned status %d", resp.StatusCode)}
