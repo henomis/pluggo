@@ -24,7 +24,7 @@ func main() {
 	p := pluggo.NewPlugin()
 
 	time.AfterFunc(2*time.Second, func() {
-		fmt.Fprintf(os.Stderr, "shutting down plugin after 10 seconds\n")
+		fmt.Fprintf(os.Stderr, "shutting down plugin after 2 seconds\n")
 		p.Stop()
 	})
 

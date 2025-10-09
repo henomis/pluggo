@@ -35,7 +35,12 @@ func main() {
 		fmt.Printf("- %s\n", functionName)
 	}
 
-	hello := pluggo.NewFunction[In, Out]("hello", client.Connection())
+	hello, err := pluggo.NewFunction[In, Out]("hello", client.Connection())
+	if err != nil {
+		fmt.Printf("error creating function: %v\n", err)
+		return
+	}
+
 	helloSchema, err := hello.Schema()
 	if err != nil {
 		fmt.Printf("error pinging function: %v\n", err)

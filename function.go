@@ -22,7 +22,15 @@ type Function[T, R any] struct {
 // NewFunction creates a new typed function client for calling a specific function on a plugin.
 // The function will serialize input of type T to JSON, send it to the plugin,
 // and deserialize the response into type R.
-func NewFunction[T, R any](name string, clientConnection *Connection) *Function[T, R] {
+func NewFunction[T, R any](name string, clientConnection *Connection) (*Function[T, R], error) {
+	if clientConnection == nil {
+		return nil, fmt.Errorf("client connection cannot be nil")
+	}
+
+	if clientConnection.BaseURL == "" {
+		return nil, fmt.Errorf("client connection BaseURL cannot be empty")
+	}
+
 	function := &Function[T, R]{
 		name:             name,
 		clientConnection: clientConnection,
@@ -73,7 +81,7 @@ func NewFunction[T, R any](name string, clientConnection *Connection) *Function[
 	}
 
 	function.fn = fn
-	return function
+	return function, nil
 }
 
 // SetTimeout configures the HTTP timeout for this specific function.

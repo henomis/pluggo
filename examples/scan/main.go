@@ -34,7 +34,11 @@ func main() {
 			return
 		}
 
-		fn := pluggo.NewFunction[shared.Input, shared.Output]("exec", p.Connection())
+		fn, err := pluggo.NewFunction[shared.Input, shared.Output]("exec", p.Connection())
+		if err != nil {
+			fmt.Printf("error creating function: %v\n", err)
+			return
+		}
 
 		data[plugin] = Data{
 			Path:     plugin,

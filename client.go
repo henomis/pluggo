@@ -55,6 +55,7 @@ type Client struct {
 	healthCheckTimeout       time.Duration
 	healthCheckInterval      time.Duration
 	heartbeatInterval        time.Duration
+	heartbeatChan            chan struct{}
 
 	httpClient     *http.Client
 	connection     *Connection
@@ -122,6 +123,10 @@ func New(path string, opts ...ClientOption) *Client {
 // Returns an error if any step fails. The plugin process will be terminated
 // automatically if initialization fails.
 func (c *Client) Open(ctx context.Context) error {
+	if c.commandContext != nil {
+		return errors.New("plugin is already running")
+	}
+
 	fileInfo, err := os.Stat(c.path)
 	if err != nil || fileInfo.IsDir() {
 		return &PluginNotFoundError{Err: err}
@@ -171,33 +176,28 @@ func (c *Client) Open(ctx context.Context) error {
 		return &PluginExecutionError{Err: err}
 	}
 
+	if c.heartbeatInterval > 0 {
+		c.heartbeatChan = make(chan struct{})
+		go func() {
+			ticker := time.NewTicker(c.heartbeatInterval)
+			defer ticker.Stop()
+
+			for range ticker.C {
+				err := c.waitForHealth()
+				if err != nil {
+					_ = c.Close()
+					return
+				}
+			}
+		}()
+	}
+
 	return nil
 }
 
-// create a function that return a channel to the user and start a goroutine that
-// periodically check the health endpoint of the plugin. If the plugin becomes unhealthy
-// it closes the channel to notify the user.
-func (c *Client) HealthCheck() <-chan struct{} {
-	if c.heartbeatInterval <= 0 {
-		ch := make(chan struct{})
-		close(ch)
-		return ch
-	}
-
-	ch := make(chan struct{})
-	go func() {
-		ticker := time.NewTicker(c.healthCheckInterval)
-		defer ticker.Stop()
-
-		for range ticker.C {
-			err := c.waitForHealth()
-			if err != nil {
-				close(ch)
-				return
-			}
-		}
-	}()
-	return ch
+// Done returns a channel that signals the health status of the plugin.
+func (c *Client) Done() <-chan struct{} {
+	return c.heartbeatChan
 }
 
 // Close gracefully shuts down the plugin process and cleans up resources.
@@ -207,6 +207,12 @@ func (c *Client) Close() error {
 	defer func() {
 		c.commandContext = nil
 		c.cancel = nil
+		if c.heartbeatChan != nil {
+			close(c.heartbeatChan)
+			c.heartbeatChan = nil
+		}
+		c.connection = nil
+		c.httpClient = nil
 	}()
 
 	if c.cancel != nil {
@@ -230,6 +236,10 @@ func (c *Client) Connection() *Connection {
 // from the plugin. This provides introspection capabilities to understand what
 // functions are available and their expected data structures.
 func (c *Client) Schemas() (Schemas, error) {
+	if c.connection == nil {
+		return nil, errors.New("plugin is not connected")
+	}
+
 	resp, err := c.httpClient.Get(c.connection.BaseURL + schemasPath)
 	if err != nil {
 		return nil, &PluginExecutionError{Err: err}
